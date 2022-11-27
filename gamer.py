@@ -1,31 +1,22 @@
 import socket
 
-def send_to_server():
-    HEADER = 64
-    PORT = 5050
-    FORMAT = 'utf-8'
-    
-    SERVER = '192.168.1.11'
-    ADDR = (SERVER, PORT)
-    
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(ADDR)
-    print("CONNECTED")
-    
-    def Send(msg):
-        message = msg.encode(FORMAT)
-        msg_lenght = len(message)
-        send_lenght = str(msg_lenght).encode(FORMAT)
-        send_lenght += b'' * (HEADER - len(send_lenght))
-        client.send(send_lenght)
-        client.send(message)
-        print(client.recv(3000))
+HEADER = 64
+PORT = 5050
+FORMAT = 'utf-8'
+
+SERVER = '172.29.16.1'
+ADDR = (SERVER, PORT)
+
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client.connect(ADDR)
+print("CONNECTED")
+
 
 import time
 import turtle
 from random import randint, choice, randrange
-'''import pygame
 
+import pygame
 # music module
 file = 'Dubsleep.mp3'
 pygame.init()
@@ -44,23 +35,25 @@ screen.tracer(0)
 
 
 # labirint maker
-grid = [] # boarders array
-field = [] # free poles array (places of gaemer motion)
+grid = []  # boarders array
+field = []  # free poles array (places of gaemer motion)
 
-def Board(grid, gamer): # this is function of detecting, that gamer is in the board place
+
+def Board(grid, gamer):  # this is function of detecting, that gamer is in the board place
     for item in grid:
         if gamer.distance(item) < 10 and item.color()[0] == 'white':
             return True
     return False
 
-def Board_index(grid, gamer): # this is function of detecting and returning index of the board, where gamer is located
+
+def Board_index(grid, gamer):  # this is function of detecting and returning index of the board, where gamer is located
     for i in range(len(grid)):
         if gamer.distance(grid[i]) < 10 and grid[i].color()[0] == 'white':
             return i
     return False
 
 
-def Make_grid(IsBuild = False): # function of making labirint boarders with updating main params
+def Make_grid(IsBuild=False):  # function of making labirint boarders with updating main params
     global grid, field
     if IsBuild:
         x = -320
@@ -72,7 +65,7 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
             else:
                 i = True
             while (x < 280):
-                if (x**2 + y**2 != 0):
+                if (x ** 2 + y ** 2 != 0):
                     cube = turtle.Turtle()
                     cube.color('white')
                     cube.shape('square')
@@ -90,7 +83,7 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
             else:
                 x = -320
 
-    # algorithm of KRUSKAL (making labirint algorithm) start
+        # algorithm of KRUSKAL (making labirint algorithm) start
         x = -280
         y = 260
         while (y > -300):
@@ -103,7 +96,6 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
                 x += 40
             x = -280
             y -= 40
-
 
     def Find(a, b):
         global field
@@ -129,7 +121,6 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
                     return i
         return -1
 
-
     def FindBlocks(obj):
         global grid, field
         build = turtle.Turtle()
@@ -151,11 +142,10 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
                 build.forward(20)
                 continue
             res.append(x)
-            #build.reset()
+            # build.reset()
             return res
-        #build.reset()
+        # build.reset()
         return []
-
 
     while (len(field) > 1):
         index = randint(0, len(grid) - 1)
@@ -181,8 +171,6 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
             field.append([i])
     field.pop(0)
 
-
-
     # algorithm of KRUSKAL (making labirint algorithm) end
 
 
@@ -190,9 +178,10 @@ def Make_grid(IsBuild = False): # function of making labirint boarders with upda
 
 Make_grid(True)
 
+
 def Update_gamer():
     global players
-    cols = ['yellow', 'blue'] # array of colors of turtles
+    cols = ['yellow', 'blue']  # array of colors of turtles
     for i in range(len(players)):
         players[i].color(cols[i])
         players[i].shape('turtle')
@@ -200,14 +189,90 @@ def Update_gamer():
         players[i].penup()
         players[i].goto(-280, 260)
 
-pcount = 2 # count of players (we have just 2)
-players = [] # array of gamer-turtle objects
+
+pcount = 2  # count of players (we have just 2)
+players = []  # array of gamer-turtle objects
 for i in range(pcount):
     players.append(turtle.Turtle())
 
 Update_gamer()
 
 
+RunWhile = True
+
+
+def Stop():
+    globals()['screen'].bgcolor('red')
+    time.sleep(0.5)
+    globals()['RunWhile'] = False
+
+
+def PlaceBack():
+    global players
+    for i in players:
+        i.goto(-280, 260)
+
+
+
+def Clear():
+    global grid
+    for item in grid:
+        item.color('white')
+
+
+def Update_win():
+    global win
+    win.goto(240, -260)
+
+
+win = turtle.Turtle()
+win.color('red')
+win.shape('turtle')
+win.shapesize(1, 1, 1)
+win.penup()
+Update_win()
+
+# star creating-deleting module---------------------------------
+star_obj = []
+mas_color = ['red', 'white', 'orange', 'blue', 'yellow']
+
+StarClock = time.time()
+
+StarBoard = 5  # time-board of switching stars
+
+StarCount = 20  # count of all stars
+
+
+def Make_star():
+    global star_obj, StarCount, mas_color, StarClock, win
+    for i in range(StarCount):
+        x = turtle.Turtle()
+        x.shape('square')
+        x.shapesize(0.3, 0.3, 1)
+        x.setheading(45)
+        x.penup()
+        x.goto(randrange(-290, 290, 20), randrange(-290, 290, 20))
+        star_obj.append(x)
+    for i in star_obj:
+        i.color(choice(mas_color))
+    Update_win()
+    StarClock = time.time()
+
+
+def Update_star():
+    global star_obj, StarCount, mas_color, StarClock, win
+    for i in star_obj:
+        i.goto(randrange(-290, 290, 20), randrange(-290, 290, 20))
+    for i in star_obj:
+        i.color(choice(mas_color))
+    Update_win()
+    StarClock = time.time()
+
+
+Make_star()
+
+# star creating-deleting module---------------------------------
+# main updating module
 
 def Move(gamer, grid, dir):
     if dir == "Up" and gamer.position()[1] < 280:
@@ -236,28 +301,60 @@ def Move(gamer, grid, dir):
             gamer.forward(20)
 
 
-RunWhile = True
+def Send(msg):
+    message = msg.encode(FORMAT)
+    msg_lenght = len(message)
+    send_lenght = str(msg_lenght).encode(FORMAT)
+    send_lenght += b'' * (HEADER - len(send_lenght))
+    client.send(send_lenght)
+    client.send(message)
+    command = client.recv(3000).decode(FORMAT)
+    print(command)
+    Move(players[1], grid, command)
 
-def Stop():
-    globals()['screen'].bgcolor('red')
-    time.sleep(0.5)
-    globals()['RunWhile'] = False
+def Move_send(gamer, grid, dir):
+    if dir == "Up" and gamer.position()[1] < 280:
+        gamer.setheading(90)
+        gamer.forward(20)
+        if Board(grid, gamer):
+            gamer.setheading(270)
+            gamer.forward(20)
+        Send("Up")
+    if dir == "Down" and gamer.position()[1] > -280:
+        gamer.setheading(270)
+        gamer.forward(20)
+        if Board(grid, gamer):
+            gamer.setheading(90)
+            gamer.forward(20)
+        Send("Down")
+    if dir == "Left" and gamer.position()[0] > -300:
+        gamer.setheading(180)
+        gamer.forward(20)
+        if Board(grid, gamer):
+            gamer.setheading(0)
+            gamer.forward(20)
+        Send("Left")
+    if dir == "Right" and gamer.position()[0] < 280:
+        gamer.setheading(0)
+        gamer.forward(20)
+        if Board(grid, gamer):
+            gamer.setheading(180)
+            gamer.forward(20)
+        Send("Right")
 
-def PlaceBack():
-    global players
-    for i in players:
-        i.goto(-280, 260)
 
+#keys_listening module
+screen.onkeypress(lambda: Move_send(players[0], grid, 'Up'), 'Up')
+screen.onkeypress(lambda: Move_send(players[0], grid, 'Down'), 'Down')
+screen.onkeypress(lambda: Move_send(players[0], grid, 'Left'), 'Left')
+screen.onkeypress(lambda: Move_send(players[0], grid, 'Right'), 'Right')
 
-screen.onkeypress(lambda: Move(players[0], grid, 'Up'), 'Up')
-screen.onkeypress(lambda: Move(players[0], grid, 'Down'), 'Down')
-screen.onkeypress(lambda: Move(players[0], grid, 'Left'), 'Left')
-screen.onkeypress(lambda: Move(players[0], grid, 'Right'), 'Right')
-
+'''
 screen.onkeypress(lambda: Move(players[1], grid, 'Up'), 'w')
 screen.onkeypress(lambda: Move(players[1], grid, 'Down'), 's')
 screen.onkeypress(lambda: Move(players[1], grid, 'Left'), 'a')
 screen.onkeypress(lambda: Move(players[1], grid, 'Right'), 'd')
+'''
 
 screen.onkeypress(lambda: players[0].goto(-300, 300), 'Z')
 screen.onkeypress(lambda: PlaceBack(), 'O')
@@ -266,65 +363,12 @@ screen.onkeypress(lambda: players[1].goto(-300, 300), 'V')
 screen.onkeypress(lambda: Stop(), 'Q')
 
 screen.listen()
+#keys_listening module
 
-def Clear():
-    global grid
-    for item in grid:
-        item.color('white')
-
-def Update_win():
-    global win
-    win.goto(240, -260)
-
-win = turtle.Turtle()
-win.color('red')
-win.shape('turtle')
-win.shapesize(1, 1, 1)
-win.penup()
-Update_win()
-
-#star creating-deleting module---------------------------------
-star_obj = []
-mas_color = ['red', 'white', 'orange', 'blue', 'yellow']
-
-StarClock = time.time()
-
-StarBoard = 5 #time-board of switching stars
-
-StarCount = 20 #count of all stars
-
-
-def Make_star():
-    global star_obj, StarCount, mas_color, StarClock, win
-    for i in range(StarCount):
-        x = turtle.Turtle()
-        x.shape('square')
-        x.shapesize(0.3, 0.3, 1)
-        x.setheading(45)
-        x.penup()
-        x.goto(randrange(-290, 290, 20), randrange(-290, 290, 20))
-        star_obj.append(x)
-    for i in star_obj:
-        i.color(choice(mas_color))
-    Update_win()
-    StarClock = time.time()
-
-def Update_star():
-    global star_obj, StarCount, mas_color, StarClock, win
-    for i in star_obj:
-        i.goto(randrange(-290, 290, 20), randrange(-290, 290, 20))
-    for i in star_obj:
-        i.color(choice(mas_color))
-    Update_win()
-    StarClock = time.time()
-
-Make_star()
-
-#star creating-deleting module---------------------------------
-#main updating module
 while RunWhile:
     if time.time() - StarClock > StarBoard:
         Update_star()
+    #Send(str(players[0].position()))
     for i in range(len(players)):
         if players[i].distance(win) < 15:
             screen.bgcolor(('yellow', 'blue')[i])
@@ -335,4 +379,7 @@ while RunWhile:
             screen.bgcolor('black')
             Update_win()
     screen.update()
-#THE END
+
+client.close()
+# THE END
+
