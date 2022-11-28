@@ -3,7 +3,8 @@ import threading
 
 HEADER = 64
 PORT = 5050
-SERVER = socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.31.151' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+
 
 ADDR = (SERVER, PORT)
 
@@ -15,7 +16,7 @@ GAME = []
 
 def handle_client(conn, addr):
     global GAME
-    GAME.append([conn, [-280, 260]])
+    GAME.append([conn, ''])
     print('NEW_CONNECTION: ' + str(addr) + " connected: ")
     connected = True
     while connected:
@@ -34,7 +35,7 @@ def handle_client(conn, addr):
                 for i in GAME:
                     if i != c:
                         count += 1
-                        c[0].send((str(i[1][0]) + "+" + str(i[1][1])).encode(FORMAT))
+                        c[0].send((str(i[1])).encode(FORMAT))
             if count == 0:
                 conn.send(str(GAME[0][1]).encode(FORMAT))
     print("[BREAK] connection")
