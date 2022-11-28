@@ -4,7 +4,7 @@ HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
 
-SERVER = '172.29.16.1'
+SERVER = '192.168.31.151'
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -151,7 +151,7 @@ def Make_grid(IsBuild=False):  # function of making labirint boarders with updat
         index = randint(0, len(grid) - 1)
         obj = grid[index]
         mas = FindBlocks(obj)
-        flag = True
+        #flag = True
         if len(mas) <= 1 or mas[0] == mas[1]:
             continue
         cube = turtle.Turtle()
@@ -300,6 +300,8 @@ def Move(gamer, grid, dir):
             gamer.setheading(180)
             gamer.forward(20)
 
+LEN_GRIG = 659
+SETGRID_MESSAGE = '!SETGRID'
 
 def Send(msg):
     message = msg.encode(FORMAT)
@@ -308,9 +310,35 @@ def Send(msg):
     send_lenght += b'' * (HEADER - len(send_lenght))
     client.send(send_lenght)
     client.send(message)
-    command = client.recv(3000).decode(FORMAT)
+    command = client.recv(2048).decode(FORMAT)
     print(command)
-    Move(players[1], grid, command)
+    if command == SETGRID_MESSAGE:
+        for i in range(LEN_GRIG):
+            msg = client.recv(2048).decode(FORMAT)
+            grid[i] = msg
+    else:
+        Move(players[1], grid, command)
+
+
+#grid_sending module (to server)
+def Send_grid():
+    global grid, client
+    message = SETGRID_MESSAGE
+    msg_lenght = len(message)
+    send_lenght = str(msg_lenght).encode(FORMAT)
+    send_lenght += b'' * (HEADER - len(send_lenght))
+    client.send(send_lenght)
+    client.send(message)
+    for i in range(len(grid)):
+        message = grid[i].color()[0]
+        msg_lenght = len(message)
+        send_lenght = str(msg_lenght).encode(FORMAT)
+        send_lenght += b'' * (HEADER - len(send_lenght))
+        client.send(send_lenght)
+        client.send(message)
+
+
+#grid_sending module (to server)
 
 def Move_send(gamer, grid, dir):
     if dir == "Up" and gamer.position()[1] < 280:
@@ -382,4 +410,3 @@ while RunWhile:
 
 client.close()
 # THE END
-
