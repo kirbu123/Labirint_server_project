@@ -4,7 +4,7 @@ import threading
 HEADER = 64
 PORT = 5050
 LEN_GRIG = 659
-SERVER = '192.168.31.151' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.125.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
 
 
 ADDR = (SERVER, PORT)
@@ -28,9 +28,9 @@ def handle_client(conn, addr):
             msg = conn.recv(msg_lenght).decode(FORMAT)
 
 
-            this, other = GAME[0], GAME[1]
+            this, other = GAME[0], GAME[0]
             for i in range(len(GAME)):
-                if GAME[i][0] != conn:
+                if GAME[i] != conn:
                     other = GAME[i]
                 else:
                     this = GAME[i]
@@ -40,15 +40,18 @@ def handle_client(conn, addr):
                 connected = False
                 continue
             elif msg == SETGRID_MESSAGE:
-                if len(GAME) == 1:
-                    continue
-                other.send('!SETGRID')
+                grid = []
+                other.send(SETGRID_MESSAGE.encode(FORMAT))
                 for i in range(LEN_GRIG):
                     msg_lenght = conn.recv(HEADER).decode(FORMAT)
                     if msg_lenght:
                         msg_lenght = int(msg_lenght)
                         msg = conn.recv(msg_lenght).decode(FORMAT)
-                        other.send(msg.encode(FORMAT))
+                        grid.append(msg)
+                if len(GAME) == 1:
+                    continue
+                for i in range(LEN_GRIG):
+                    other.send(grid[i].encode(FORMAT))
                 continue
 
             print(str(addr) + ' SENT: ' + str(msg))
