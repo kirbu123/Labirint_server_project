@@ -40,23 +40,14 @@ def handle_client(conn, addr):
                 connected = False
                 continue
             elif msg == SETGRID_MESSAGE:
-                grid = []
-                other.send(SETGRID_MESSAGE.encode(FORMAT))
-                for i in range(LEN_GRIG):
-                    msg_lenght = conn.recv(HEADER).decode(FORMAT)
-                    if msg_lenght:
-                        msg_lenght = int(msg_lenght)
-                        msg = conn.recv(msg_lenght).decode(FORMAT)
-                        grid.append(msg)
-                if len(GAME) == 1:
-                    continue
-                for i in range(LEN_GRIG):
-                    other.send(grid[i].encode(FORMAT))
-                continue
+                msg_lenght = conn.recv(HEADER).decode(FORMAT)
+                msg_lenght = int(msg_lenght)
+                msg = conn.recv(msg_lenght).decode(FORMAT)
+                '''if len(GAME) == 1:
+                    continue'''
+                other.send(msg.encode(FORMAT))
 
             print(str(addr) + ' SENT: ' + str(msg))
-            count = 0
-
 
             if len(GAME) == 1:
                 this.send(msg.encode(FORMAT))
