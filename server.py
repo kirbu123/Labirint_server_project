@@ -1,4 +1,3 @@
-import random
 import socket
 import threading
 
@@ -16,7 +15,6 @@ FORMAT = 'utf-8'
 DISCONNECTED_MESSAGE = '!DISCONNECT'
 SETGRID_MESSAGE = '!SETGRID'
 GAME = []
-PRIORITY = {}
 
 def Get(conn):
     msg = conn.recv(2048).decode(FORMAT)
@@ -30,31 +28,24 @@ def Set(conn, msg):
 def handle_client(conn, addr):
     global GAME, PRIORITY
     if len(GAME) == 1:
-        other = GAME[0]
+        other = conn
     else:
         other = conn
-    PRIORITY[conn] = 0
     GAME.append(conn)
-    count = 0
-    for i in PRIORITY:
-        if count == 0:
-            PRIORITY[i] = 1
-        else:
-            PRIORITY[i] = 0
-        count += 1
     while True:
+        print(len(GAME))
         if len(GAME) == 1:
             other = conn
         msg = Get(conn)
         for iter in msg:
-            print(print(str(addr) + ": " + str(iter)))
+            #print(print(str(addr) + ": " + str(iter)))
             if iter[0] == 'P':
                 Set(other, iter)
             elif iter[0] == 'S':
                 print('---------------------------------------------------------------------')
-                if PRIORITY[conn] == 1:
-                    Set(other, iter)
-                    Set(other, 'P#-280#260#0.0')
+                for i in GAME:
+                    Set(i, iter)
+                    Set(i, 'P#-280#260#0.0')
 
 
 
