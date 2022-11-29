@@ -325,6 +325,8 @@ def Send_grid():
 
 #grid_sending module (to server)
 
+def Sync():
+    Set(client, 'SYNC')
 
 def Send(msg):
     Set(client, msg)
@@ -334,7 +336,7 @@ def Send(msg):
         if command[iter] == 'START':
             PlaceBack()
             Send_grid()
-        if command[iter][0].islower():
+        elif command[iter][0].islower():
             print("FLAG")
             for i in range(LEN_GRIG):
                 if command[iter][i] == 'w':
@@ -398,7 +400,7 @@ screen.onkeypress(lambda: Stop(), 'Q')
 screen.listen()
 #keys_listening module
 
-Send_grid()
+Sync()
 while RunWhile:
     if time.time() - StarClock > StarBoard:
         Update_star()
@@ -412,7 +414,7 @@ while RunWhile:
             Update_gamer()
             screen.bgcolor('black')
             Update_win()
-            Send_grid()
+            Sync()
     screen.update()
 
 client.close()
