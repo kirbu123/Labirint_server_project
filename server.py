@@ -4,7 +4,7 @@ import threading
 HEADER = 64
 PORT = 5050
 LEN_GRIG = 659
-SERVER = '192.168.125.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.43.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
 
 
 ADDR = (SERVER, PORT)
@@ -16,43 +16,33 @@ DISCONNECTED_MESSAGE = '!DISCONNECT'
 SETGRID_MESSAGE = '!SETGRID'
 GAME = []
 
+def Get(conn):
+    msg = conn.recv(2048).decode(FORMAT)
+    return msg.split()
+
+def Set(conn, msg):
+    conn.send(' '.encode(FORMAT))
+    conn.send(msg.encode(FORMAT))
+    conn.send(' '.encode(FORMAT))
+
 def handle_client(conn, addr):
     global GAME
     GAME.append(conn)
     print('NEW_CONNECTION: ' + str(addr) + " connected: ")
     connected = True
     while connected:
-        msg_lenght = conn.recv(HEADER).decode(FORMAT)
-        if msg_lenght:
-            msg_lenght = int(msg_lenght)
-            msg = conn.recv(msg_lenght).decode(FORMAT)
 
+        other = conn
+        for i in range(len(GAME)):
+            if GAME[i] != conn:
+                other = GAME[i]
+                break
 
-            this, other = GAME[0], GAME[0]
-            for i in range(len(GAME)):
-                if GAME[i] != conn:
-                    other = GAME[i]
-                else:
-                    this = GAME[i]
+        msg = Get(conn)
+        print(str(addr) + ' SENT: ' + str(msg))
+        for i in range(len(msg)):
+            Set(other, msg[i])
 
-
-            if msg == DISCONNECTED_MESSAGE:
-                connected = False
-                continue
-            elif msg == SETGRID_MESSAGE:
-                msg_lenght = conn.recv(HEADER).decode(FORMAT)
-                msg_lenght = int(msg_lenght)
-                msg = conn.recv(msg_lenght).decode(FORMAT)
-                '''if len(GAME) == 1:
-                    continue'''
-                other.send(msg.encode(FORMAT))
-
-            print(str(addr) + ' SENT: ' + str(msg))
-
-            if len(GAME) == 1:
-                this.send(msg.encode(FORMAT))
-            else:
-                other.send(msg.encode(FORMAT))
 
     print("[BREAK] connection")
     for i in range(len(GAME)):
