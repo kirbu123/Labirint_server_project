@@ -4,7 +4,7 @@ HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
 
-SERVER = '192.168.43.239'
+SERVER = '192.168.1.100'
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -314,22 +314,6 @@ def Set(conn, msg):
     conn.send(msg.encode(FORMAT))
     conn.send(' '.encode(FORMAT))
 
-def Send(msg):
-    Set(client, msg)
-    command = Get(client)
-    print(command)
-    for iter in range(len(command)):
-        if command[iter][0].islower():
-            print("FLAG")
-            for i in range(LEN_GRIG):
-                if command[iter][i] == 'w':
-                    grid[i].color('white')
-                else:
-                    grid[i].color('black')
-        else:
-            print('move')
-            Move(players[1], grid, command[iter])
-
 
 #grid_sending module (to server)
 def Send_grid():
@@ -340,6 +324,26 @@ def Send_grid():
     Set(client, s)
 
 #grid_sending module (to server)
+
+
+def Send(msg):
+    Set(client, msg)
+    command = Get(client)
+    print(command)
+    for iter in range(len(command)):
+        if command[iter] == 'START':
+            PlaceBack()
+            Send_grid()
+        if command[iter][0].islower():
+            print("FLAG")
+            for i in range(LEN_GRIG):
+                if command[iter][i] == 'w':
+                    grid[i].color('white')
+                else:
+                    grid[i].color('black')
+        else:
+            print('move')
+            Move(players[1], grid, command[iter])
 
 def Move_send(gamer, grid, dir):
     if dir == "Up" and gamer.position()[1] < 280:
@@ -394,7 +398,7 @@ screen.onkeypress(lambda: Stop(), 'Q')
 screen.listen()
 #keys_listening module
 
-#Send_grid()
+Send_grid()
 while RunWhile:
     if time.time() - StarClock > StarBoard:
         Update_star()
