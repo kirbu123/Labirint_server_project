@@ -359,6 +359,7 @@ def Sync():
 
 #server_mode
 
+Sync()
 while RunWhile:
     if time.time() - StarClock > StarBoard:
         Update_star()
@@ -378,3 +379,4 @@ while RunWhile:
 
 client.close()
 # THE END
+
