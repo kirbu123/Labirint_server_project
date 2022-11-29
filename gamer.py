@@ -4,7 +4,7 @@ HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
 
-SERVER = '192.168.125.239'
+SERVER = '192.168.43.239'
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -303,40 +303,41 @@ def Move(gamer, grid, dir):
 LEN_GRIG = 659
 SETGRID_MESSAGE = '!SETGRID'
 
+
+def Get(conn):
+    msg = conn.recv(2048).decode(FORMAT)
+    return msg.split()
+
+
+def Set(conn, msg):
+    conn.send(' '.encode(FORMAT))
+    conn.send(msg.encode(FORMAT))
+    conn.send(' '.encode(FORMAT))
+
 def Send(msg):
-    message = msg.encode(FORMAT)
-    msg_lenght = len(message)
-    send_lenght = str(msg_lenght).encode(FORMAT)
-    send_lenght += b'' * (HEADER - len(send_lenght))
-    client.send(send_lenght)
-    client.send(message)
-    command = client.recv(2048).decode(FORMAT)
+    Set(client, msg)
+    command = Get(client)
     print(command)
-    if command == SETGRID_MESSAGE:
-        msg = client.recv(2048).decode(FORMAT)
-        for i in range(LEN_GRIG):
-            if msg[i] == 'w':
-                grid[i].color('white')
-            else:
-                grid[i].color('black')
-    else:
-        Move(players[1], grid, command)
+    for iter in range(len(command)):
+        if command[iter][0].islower():
+            print("FLAG")
+            for i in range(LEN_GRIG):
+                if command[iter][i] == 'w':
+                    grid[i].color('white')
+                else:
+                    grid[i].color('black')
+        else:
+            print('move')
+            Move(players[1], grid, command[iter])
 
 
 #grid_sending module (to server)
 def Send_grid():
     global grid, client
-    message = SETGRID_MESSAGE
-    msg_lenght = len(message)
-    send_lenght = str(msg_lenght).encode(FORMAT)
-    send_lenght += b'' * (HEADER - len(send_lenght))
-    client.send(send_lenght)
-    client.send(message.encode(FORMAT))
     s = ''
     for i in range(len(grid)):
         s += grid[i].color()[0][0]
-    client.send(str(len(s)).encode(FORMAT))
-    client.send(s.encode(FORMAT))
+    Set(client, s)
 
 #grid_sending module (to server)
 
@@ -393,6 +394,7 @@ screen.onkeypress(lambda: Stop(), 'Q')
 screen.listen()
 #keys_listening module
 
+#Send_grid()
 while RunWhile:
     if time.time() - StarClock > StarBoard:
         Update_star()
