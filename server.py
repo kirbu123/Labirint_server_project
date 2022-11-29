@@ -1,3 +1,4 @@
+import random
 import socket
 import threading
 
@@ -44,7 +45,10 @@ def handle_client(conn, addr):
         msg = Get(conn)
         print(str(addr) + ' SENT: ' + str(msg))
         for i in range(len(msg)):
-            Set(other, msg[i])
+            if msg[i] == 'SYNC':
+                Set(random.choice(GAME), 'START')
+            else:
+                Set(other, msg[i])
 
 
     print("[BREAK] connection")
