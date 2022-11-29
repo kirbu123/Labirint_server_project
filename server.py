@@ -4,7 +4,7 @@ import threading
 HEADER = 64
 PORT = 5050
 LEN_GRIG = 659
-SERVER = '192.168.43.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.76.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
 
 
 ADDR = (SERVER, PORT)
@@ -25,22 +25,27 @@ def Set(conn, msg):
     conn.send(msg.encode(FORMAT))
     conn.send(' '.encode(FORMAT))
 
+def Other(conn):
+    global GAME
+    for i in GAME:
+        if i != conn:
+            return i
+    return conn
+
+
 def handle_client(conn, addr):
-    global GAME, PRIORITY
-    if len(GAME) == 1:
-        other = conn
-    else:
-        other = conn
+    global GAME
     GAME.append(conn)
     while True:
         print(len(GAME))
-        if len(GAME) == 1:
-            other = conn
         msg = Get(conn)
         for iter in msg:
             #print(print(str(addr) + ": " + str(iter)))
             if iter[0] == 'P':
-                Set(other, iter)
+                if len(GAME) < 2:
+                    Set(GAME[0], iter)
+                else:
+                    Set(Other(conn), iter)
             elif iter[0] == 'S':
                 print('---------------------------------------------------------------------')
                 for i in GAME:
