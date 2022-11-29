@@ -5,7 +5,7 @@ import threading
 HEADER = 64
 PORT = 5050
 LEN_GRIG = 659
-SERVER = '192.168.1.100' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.43.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
 
 
 ADDR = (SERVER, PORT)
@@ -16,6 +16,7 @@ FORMAT = 'utf-8'
 DISCONNECTED_MESSAGE = '!DISCONNECT'
 SETGRID_MESSAGE = '!SETGRID'
 GAME = []
+PRIORITY = {}
 
 def Get(conn):
     msg = conn.recv(2048).decode(FORMAT)
@@ -27,36 +28,35 @@ def Set(conn, msg):
     conn.send(' '.encode(FORMAT))
 
 def handle_client(conn, addr):
-    global GAME
-    GAME.append(conn)
-    print('NEW_CONNECTION: ' + str(addr) + " connected: ")
-    if threading.active_count() - 1 == 2:
-        for i in GAME:
-            i.send('START'.encode(FORMAT))
-    connected = True
-    while connected:
-
+    global GAME, PRIORITY
+    if len(GAME) == 1:
+        other = GAME[0]
+    else:
         other = conn
-        for i in range(len(GAME)):
-            if GAME[i] != conn:
-                other = GAME[i]
-                break
-
+    PRIORITY[conn] = 0
+    GAME.append(conn)
+    count = 0
+    for i in PRIORITY:
+        if count == 0:
+            PRIORITY[i] = 1
+        else:
+            PRIORITY[i] = 0
+        count += 1
+    while True:
+        if len(GAME) == 1:
+            other = conn
         msg = Get(conn)
-        print(str(addr) + ' SENT: ' + str(msg))
-        for i in range(len(msg)):
-            if msg[i] == 'SYNC':
-                Set(random.choice(GAME), 'START')
-            else:
-                Set(other, msg[i])
+        for iter in msg:
+            print(print(str(addr) + ": " + str(iter)))
+            if iter[0] == 'P':
+                Set(other, iter)
+            elif iter[0] == 'S':
+                print('---------------------------------------------------------------------')
+                if PRIORITY[conn] == 1:
+                    Set(other, iter)
+                    Set(other, 'P#-280#260#0.0')
 
 
-    print("[BREAK] connection")
-    for i in range(len(GAME)):
-        if GAME[i][0] == conn:
-            GAME.pop(i)
-            break
-    conn.close()
 
 def start():
     server.listen()
