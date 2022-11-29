@@ -4,7 +4,7 @@ import threading
 HEADER = 64
 PORT = 5050
 LEN_GRIG = 659
-SERVER = '192.168.43.239' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
+SERVER = '192.168.1.100' #socket.gethostbyname(socket.gethostname()) #'172.29.16.1'
 
 
 ADDR = (SERVER, PORT)
@@ -29,6 +29,9 @@ def handle_client(conn, addr):
     global GAME
     GAME.append(conn)
     print('NEW_CONNECTION: ' + str(addr) + " connected: ")
+    if threading.active_count() - 1 == 2:
+        for i in GAME:
+            i.send('START')
     connected = True
     while connected:
 
