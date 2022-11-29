@@ -4,7 +4,7 @@ HEADER = 64
 PORT = 5050
 FORMAT = 'utf-8'
 
-SERVER = '192.168.43.239'
+SERVER = '192.168.1.102'
 ADDR = (SERVER, PORT)
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -334,13 +334,13 @@ def Setpos():
 def Getins():
     global client
     msg = Get(client)
-    print(msg)
     for iter in msg:
         if iter[0] == 'P':
             mas = iter.split('#')
             players[1].goto(float(mas[1]), float(mas[2]))
             players[1].setheading(float(mas[3]))
         if iter[0] == 'S':
+            print(iter)
             mas = iter.split('#')
             for i in range(len(mas[1])):
                 if mas[1][i] == 'w':
@@ -379,4 +379,3 @@ while RunWhile:
 
 client.close()
 # THE END
-
