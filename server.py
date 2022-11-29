@@ -31,7 +31,7 @@ def handle_client(conn, addr):
     print('NEW_CONNECTION: ' + str(addr) + " connected: ")
     if threading.active_count() - 1 == 2:
         for i in GAME:
-            i.send('START')
+            i.send('START'.encode(FORMAT))
     connected = True
     while connected:
 
